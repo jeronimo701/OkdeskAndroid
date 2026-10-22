@@ -1,0 +1,127 @@
+:root[data-okdesk-script-theme="dark"] #okdesk-mobile-app {
+    color-scheme: dark;
+    --mobile-bg: #10191c;
+    --mobile-surface: #1b282c;
+    --mobile-raised: #24353a;
+    --mobile-text: #edf5f3;
+    --mobile-muted: #a6bbb8;
+    --mobile-border: #3a5051;
+    --mobile-accent: #88d7c2;
+    background: var(--mobile-bg);
+    color: var(--mobile-text);
+}
+
+:root[data-okdesk-script-theme="dark"] #okdesk-mobile-app .m-top {
+    background: #155e64;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, .35);
+}
+
+:root[data-okdesk-script-theme="dark"] #okdesk-mobile-app :is(.m-toolbar, .m-tabs-bar, .m-section, .m-row, .m-row-wrap, .m-sheet, .m-sheet-choice) {
+    background: var(--mobile-surface);
+    color: var(--mobile-text);
+    border-color: var(--mobile-border);
+}
+
+:root[data-okdesk-script-theme="dark"] #okdesk-mobile-app .m-row-wrap {
+    box-shadow: 0 1px 4px rgba(0, 0, 0, .22);
+}
+
+:root[data-okdesk-script-theme="dark"] #okdesk-mobile-app .m-row:active,
+:root[data-okdesk-script-theme="dark"] #okdesk-mobile-app .m-sheet-choice:active {
+    background: #2d4545;
+}
+
+:root[data-okdesk-script-theme="dark"] #okdesk-mobile-app :is(.m-toolbar input, .m-toolbar button, .m-row-more, .m-field, .m-actions button, .m-secondary, .m-sheet-close) {
+    background: var(--mobile-raised);
+    color: var(--mobile-text);
+    border-color: var(--mobile-border);
+}
+
+:root[data-okdesk-script-theme="dark"] #okdesk-mobile-app :is(.m-toolbar input, .m-field)::placeholder {
+    color: var(--mobile-muted);
+    opacity: 1;
+}
+
+:root[data-okdesk-script-theme="dark"] #okdesk-mobile-app .m-tabs button {
+    color: var(--mobile-muted);
+}
+
+:root[data-okdesk-script-theme="dark"] #okdesk-mobile-app .m-tabs button[aria-selected="true"] {
+    color: var(--mobile-accent);
+    border-bottom-color: var(--mobile-accent);
+}
+
+:root[data-okdesk-script-theme="dark"] #okdesk-mobile-app .m-tabs-add {
+    background: var(--mobile-surface);
+    color: var(--mobile-accent);
+    border-color: var(--mobile-border);
+}
+
+:root[data-okdesk-script-theme="dark"] #okdesk-mobile-app .m-row-more,
+:root[data-okdesk-script-theme="dark"] #okdesk-mobile-app .m-attachments-toggle::after {
+    color: var(--mobile-accent);
+}
+
+:root[data-okdesk-script-theme="dark"] #okdesk-mobile-app .m-status {
+    background: #263e39;
+    color: #d9f2e8;
+}
+
+:root[data-okdesk-script-theme="dark"] #okdesk-mobile-app :is(.m-row-meta, .m-assignee, .m-muted, .m-comment-head, .m-actions button small, .m-sheet-label) {
+    color: var(--mobile-muted);
+}
+
+:root[data-okdesk-script-theme="dark"] #okdesk-mobile-app :is(.m-thread-section, .m-bottom) {
+    background: var(--mobile-bg);
+}
+
+:root[data-okdesk-script-theme="dark"] #okdesk-mobile-app .m-thread-section > h2 {
+    color: #b6d4ce;
+}
+
+:root[data-okdesk-script-theme="dark"] #okdesk-mobile-app .m-comment {
+    background: var(--mobile-surface);
+    color: var(--mobile-text);
+    border-color: var(--mobile-border);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, .24);
+}
+
+:root[data-okdesk-script-theme="dark"] #okdesk-mobile-app .m-comment-out {
+    background: #20463d;
+    border-color: #356657;
+}
+
+:root[data-okdesk-script-theme="dark"] #okdesk-mobile-app .m-comment-private {
+    background: #3a3226;
+    border-left-color: #d2a35f;
+}
+
+:root[data-okdesk-script-theme="dark"] #okdesk-mobile-app .m-comment-out.m-comment-private {
+    background: #344132;
+}
+
+:root[data-okdesk-script-theme="dark"] #okdesk-mobile-app .m-comment-head strong {
+    color: var(--mobile-text);
+}
+
+:root[data-okdesk-script-theme="dark"] #okdesk-mobile-app :is(.m-rich a, .m-attachment a, .m-summary-actions a) {
+    color: #92ded1;
+}
+
+:root[data-okdesk-script-theme="dark"] #okdesk-mobile-app :is(.m-attachment, .m-sheet-choice) {
+    border-color: var(--mobile-border);
+}
+
+:root[data-okdesk-script-theme="dark"] #okdesk-mobile-app .m-feedback {
+    color: #ffaca1;
+}
+
+:root[data-okdesk-script-theme="dark"] #okdesk-mobile-app :is(.m-primary, .m-selection-action) {
+    background: #237b7e;
+    color: #fff;
+    border-color: #439799;
+}
+
+:root[data-okdesk-script-theme="dark"] #okdesk-mobile-app :is(input, select, textarea) {
+    accent-color: #70c7ae;
+}

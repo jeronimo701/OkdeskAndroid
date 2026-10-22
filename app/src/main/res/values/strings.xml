@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Okdesk Mobile</string>
+    <string name="webview_update_required">Обновите Android System WebView или Chrome, затем откройте приложение снова.</string>
+</resources>

@@ -1,0 +1,26 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'ru.poscenter.okdesk.mobile'
+    compileSdk 35
+
+    defaultConfig {
+        applicationId 'ru.poscenter.okdesk.mobile'
+        minSdk 29
+        targetSdk 35
+        versionCode 36
+        versionName '0.2.34'
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+}
+
+dependencies {
+    implementation 'androidx.webkit:webkit:1.17.1'
+}
