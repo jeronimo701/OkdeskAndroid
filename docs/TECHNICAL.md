@@ -22,6 +22,13 @@ and build a new app version.
 
 ## Behavior
 
+- The native app bar's Login button stores separate credentials for each portal
+  origin and fills the visible login form on demand without submitting it.
+  Credentials use Android Keystore AES-GCM encryption, are excluded from script
+  snapshots, and cannot be modified/deleted through the JavaScript settings
+  bridge. Users can edit/delete them through the native dialog. Ambiguous forms
+  or origin changes abort filling. This does not extend server login sessions.
+
 - Issue layout adapts without rebuilding the detail DOM: at 840 CSS pixels or
   wider the issue list stays on the left and the selected issue is on the right,
   with independent scrolling and a selected-row accent. The View action in the

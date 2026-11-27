@@ -92,6 +92,7 @@ public final class MainActivity extends Activity {
     private TextView appBarAction;
     private LinearLayout drawerPanel;
     private Spinner themeSelector;
+    private TextView loginButton;
     private WindowInfoTrackerCallbackAdapter foldTracker;
     private WindowLayoutInfo foldLayoutInfo;
     private final Consumer<WindowLayoutInfo> foldListener = info -> {
@@ -348,6 +349,9 @@ public final class MainActivity extends Activity {
         mobileViewButton = new TextView(this);
         mobileViewButton.setText("Мобильный вид");
         mobileViewButton.setTextSize(13);
+        mobileViewButton.setSingleLine(true);
+        mobileViewButton.setMaxWidth(dp(100));
+        mobileViewButton.setEllipsize(android.text.TextUtils.TruncateAt.END);
         mobileViewButton.setTextColor(Color.WHITE);
         mobileViewButton.setGravity(Gravity.CENTER);
         mobileViewButton.setPadding(dp(10), 0, dp(10), 0);
@@ -361,10 +365,18 @@ public final class MainActivity extends Activity {
         appBarTitle = new TextView(this);
         appBarTitle.setTextColor(Color.WHITE);
         appBarTitle.setTextSize(16);
+        appBarTitle.setSingleLine(true);
+        appBarTitle.setEllipsize(android.text.TextUtils.TruncateAt.END);
         appBarTitle.setTypeface(null, android.graphics.Typeface.BOLD);
         LinearLayout.LayoutParams titleParams = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1);
         titleParams.leftMargin = dp(8);
         appBar.addView(appBarTitle, titleParams);
+
+        loginButton = new TextView(this);
+        loginButton.setText("Вход"); loginButton.setTextSize(14); loginButton.setTextColor(Color.WHITE);
+        loginButton.setGravity(Gravity.CENTER); loginButton.setContentDescription("Учётные данные для входа");
+        appBar.addView(loginButton, new LinearLayout.LayoutParams(dp(48), dp(48)));
+        loginButton.setOnClickListener(view -> showLoginActions());
 
         appBarAction = new TextView(this);
         appBarAction.setText("⚙");
@@ -454,6 +466,7 @@ public final class MainActivity extends Activity {
 
     private void updateAppBar(Uri page, boolean desktopMode) {
         boolean isOkdesk = isOkdeskOrigin(page);
+        loginButton.setVisibility(isOkdesk || isOptposOrigin(page) ? View.VISIBLE : View.GONE);
         boolean visible = !isOkdesk || desktopMode;
         appBar.setVisibility(visible ? View.VISIBLE : View.GONE);
         mobileViewButton.setVisibility(isOkdesk && desktopMode ? View.VISIBLE : View.GONE);
@@ -463,6 +476,74 @@ public final class MainActivity extends Activity {
         boolean needsApiSetup = isOkdesk && !hasOkdeskApiToken();
         appBarAction.setText(isOptposOrigin(page) ? "⚙" : "⚿");
         appBarAction.setVisibility(isOptposOrigin(page) || needsApiSetup ? View.VISIBLE : View.GONE);
+    }
+
+    private String loginOrigin() {
+        if (webView == null || webView.getUrl() == null) return null;
+        Uri page = Uri.parse(webView.getUrl());
+        if (!isOkdeskOrigin(page) && !isOptposOrigin(page)) return null;
+        return "https://" + page.getHost();
+    }
+
+    private AlertDialog.Builder loginDialog() {
+        return new AlertDialog.Builder(new android.view.ContextThemeWrapper(this, isDarkTheme()
+                ? android.R.style.Theme_Material_Dialog_Alert : android.R.style.Theme_Material_Light_Dialog_Alert));
+    }
+
+    private void showLoginActions() {
+        String origin = loginOrigin();
+        if (origin == null) return;
+        try {
+            JSONObject saved = store.login(origin);
+            if (saved.optString("username").isEmpty()) { editLogin(origin, saved); return; }
+            loginDialog().setTitle("Вход: " + Uri.parse(origin).getHost())
+                .setItems(new String[] { "Заполнить форму входа", "Изменить логин и пароль", "Удалить сохранённые данные" }, (dialog, index) -> {
+                    if (index == 0) fillLogin(origin, saved);
+                    else if (index == 1) editLogin(origin, saved);
+                    else loginDialog().setTitle("Удалить данные входа?").setMessage(origin)
+                        .setPositiveButton("Удалить", (d, w) -> {
+                            try { store.remove(SecureStore.loginKey(origin)); }
+                            catch (Exception error) { Toast.makeText(this, "Не удалось удалить данные", Toast.LENGTH_LONG).show(); }
+                        }).setNegativeButton("Отмена", null).show();
+                }).show();
+        } catch (Exception error) {
+            Toast.makeText(this, "Не удалось прочитать данные входа", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private void editLogin(String origin, JSONObject saved) {
+        android.content.Context context = new android.view.ContextThemeWrapper(this, isDarkTheme()
+                ? android.R.style.Theme_Material_Dialog_Alert : android.R.style.Theme_Material_Light_Dialog_Alert);
+        LinearLayout fields = new LinearLayout(context); fields.setOrientation(LinearLayout.VERTICAL);
+        fields.setPadding(dp(20), dp(8), dp(20), dp(8));
+        EditText username = new EditText(context); username.setSingleLine(true); username.setHint("Логин / email");
+        username.setText(saved.optString("username")); username.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
+        EditText password = new EditText(context); password.setSingleLine(true); password.setHint("Пароль");
+        password.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD); password.setText(saved.optString("password"));
+        fields.addView(username); fields.addView(password);
+        TextView note = new TextView(context); note.setText("Хранятся зашифрованно на этом телефоне. Кнопка заполняет поля, но не нажимает «Войти»."); fields.addView(note);
+        AlertDialog dialog = loginDialog().setTitle("Вход: " + Uri.parse(origin).getHost()).setView(fields)
+            .setPositiveButton("Сохранить и вставить", null).setNegativeButton("Отмена", null).create();
+        dialog.setOnShowListener(ignored -> dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(view -> {
+            if (username.getText().toString().trim().isEmpty() || password.getText().length() == 0) {
+                password.setError("Укажите логин и пароль"); return;
+            }
+            try {
+                JSONObject value = new JSONObject().put("username", username.getText().toString().trim()).put("password", password.getText().toString());
+                store.put(SecureStore.loginKey(origin), value); dialog.dismiss(); fillLogin(origin, value);
+            } catch (Exception error) { Toast.makeText(this, "Не удалось сохранить данные входа", Toast.LENGTH_LONG).show(); }
+        }));
+        dialog.show();
+    }
+
+    private void fillLogin(String origin, JSONObject value) {
+        if (!origin.equals(loginOrigin())) { Toast.makeText(this, "Откройте страницу входа нужного сайта", Toast.LENGTH_LONG).show(); return; }
+        try {
+            String script = readAsset("login-fill.js", 20_000);
+            webView.evaluateJavascript(script + "(" + value + "," + JSONObject.quote(origin) + ")", result ->
+                Toast.makeText(this, "\"ok\"".equals(result) ? "Поля заполнены. Нажмите «Войти»."
+                    : "Данные сохранены. Откройте обычную форму с одним полем пароля и нажмите «Вход» ещё раз.", Toast.LENGTH_LONG).show());
+        } catch (Exception error) { Toast.makeText(this, "Не удалось заполнить форму", Toast.LENGTH_LONG).show(); }
     }
 
     private void returnToMobileView() {
@@ -698,9 +779,11 @@ public final class MainActivity extends Activity {
             JSONObject message = new JSONObject(raw);
             switch (message.optString("type")) {
                 case "set":
+                    if (message.optString("key").startsWith("native_login_")) throw new IllegalArgumentException("Native setting");
                     store.put(message.optString("key"), message.opt("value"));
                     break;
                 case "delete":
+                    if (message.optString("key").startsWith("native_login_")) throw new IllegalArgumentException("Native setting");
                     store.remove(message.optString("key"));
                     break;
                 case "clipboard":

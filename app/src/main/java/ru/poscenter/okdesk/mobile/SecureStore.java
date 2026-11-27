@@ -30,6 +30,7 @@ final class SecureStore {
     JSONObject snapshot() throws JSONException {
         JSONObject result = new JSONObject();
         for (Map.Entry<String, ?> entry : preferences.getAll().entrySet()) {
+            if (entry.getKey().startsWith("native_login_")) continue;
             if (!(entry.getValue() instanceof String)) continue;
             try {
                 String raw = (String) entry.getValue();
@@ -49,12 +50,24 @@ final class SecureStore {
         if (key == null || key.length() > 128 || value == null) throw new IllegalArgumentException("Invalid setting");
         String raw = new JSONObject().put("value", value).toString();
         if (raw.length() > 2_000_000) throw new IllegalArgumentException("Setting is too large");
-        if (isToken(key)) raw = encrypt(raw);
+        if (isToken(key) || key.startsWith("native_login_")) raw = encrypt(raw);
         if (!preferences.edit().putString(key, raw).commit()) throw new IllegalStateException("Could not save setting");
     }
 
     void remove(String key) {
         if (key != null && key.length() <= 128) preferences.edit().remove(key).apply();
+    }
+
+    static String loginKey(String origin) throws Exception {
+        byte[] digest = java.security.MessageDigest.getInstance("SHA-256").digest(origin.getBytes(StandardCharsets.UTF_8));
+        StringBuilder key = new StringBuilder("native_login_");
+        for (byte b : digest) key.append(String.format(java.util.Locale.ROOT, "%02x", b));
+        return key.toString();
+    }
+
+    JSONObject login(String origin) throws Exception {
+        String raw = preferences.getString(loginKey(origin), null);
+        return raw == null ? new JSONObject() : new JSONObject(decrypt(raw)).getJSONObject("value");
     }
 
     private static boolean isToken(String key) {
