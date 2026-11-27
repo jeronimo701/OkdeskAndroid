@@ -1,4 +1,3 @@
-
 # Okdesk Mobile (Android)
 
 Android WebView app for Okdesk and the Poscenter portals. The app's runtime
@@ -22,6 +21,33 @@ and build a new app version.
    automatically shared with the app.
 
 ## Behavior
+
+- Issue layout adapts without rebuilding the detail DOM: at 840 CSS pixels or
+  wider the issue list stays on the left and the selected issue is on the right,
+  with independent scrolling and a selected-row accent. The View action in the
+  issue header stores a per-portal preference (automatic, two panes, one pane).
+  Forced two-pane mode requires at least 720 CSS pixels; narrower windows always
+  use one pane. View changes preserve an in-progress reply and selected files.
+  Sidebar refresh and filters do not replace the open issue. Size-related
+  Android configuration changes keep the WebView; native drawer width follows
+  the actual window.
+- Jetpack WindowManager reports fold posture and hinge bounds to the Okdesk
+  shell. A vertical separating fold uses list/detail panes on either side of
+  the hinge. A horizontal separating or half-open fold uses comments/info above
+  and reply/quick actions/status below. An 8 CSS pixel inset on each side keeps
+  controls clear of the hinge. Geometry is converted from window coordinates to
+  WebView coordinates, accounting for the native app bar. Unsupported devices or
+  insufficient space fall back to responsive layout. View menu's Flex checkbox
+  disables hinge handling; One pane also overrides it. Reparenting existing form
+  elements preserves draft text, selection and selected files. Process death or
+  explicitly opening a different issue is not draft persistence.
+- In tabletop posture on the issue list, results stay above the hinge while
+  search, recent queries, tabs and filter controls move below it. The same
+  controls are moved back on leaving tabletop mode, without duplicate inputs.
+  Posture events settle for 140 ms before reflow to avoid repeated switches
+  around a hinge threshold. Pane transitions use brief fades/translations and
+  grid-size easing. View menu's Smooth transitions checkbox disables motion;
+  Android/WebView's prefers-reduced-motion preference is also respected.
 
 - The mobile issue search keeps the latest 10 queries locally per portal for 7
   days. Enter, leaving a changed search field, or opening an issue from a search

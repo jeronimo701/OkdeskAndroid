@@ -31,6 +31,9 @@
     const MOBILE_TABS_KEY = `okdesk_mobile_tabs_${location.host}`;
     const MOBILE_GROUP_ID_KEY = `okdesk_mobile_group_id_${location.host}`;
     const MOBILE_ACTIVE_TAB_KEY = `okdesk_mobile_active_tab_${location.host}`;
+    const MOBILE_LAYOUT_KEY = `okdesk_mobile_layout_${location.host}`;
+    const MOBILE_FLEX_KEY = `okdesk_mobile_flex_${location.host}`;
+    const MOBILE_MOTION_KEY = `okdesk_mobile_motion_${location.host}`;
     const MOBILE_RECENT_SEARCHES_KEY = `okdesk_mobile_recent_searches_${location.host}`;
     const MOBILE_RECENT_SEARCH_TTL = 7 * 24 * 60 * 60 * 1000;
     const ISSUE_LIST_MANUAL_OPEN_KEY = `issue_list_manual_open_${location.host}`;
@@ -105,7 +108,7 @@
             { title: '🔎 Диагностика АСЦ', text: 'Просьба провести диагностику оборудования, проверить отсутствие следов залития, механических повреждений, постороннего вмешательства и иных исключений из гарантийных условий. По результату направьте заключение с подтверждением неисправного узла.' },
             { title: '🏢 Не АСЦ', text: 'Самостоятельная разборка и ремонт оборудования не рекомендуются. Для диагностики и ремонта просьба обратиться в авторизованный сервисный центр: https://optposcenter.ru/service/' },
             { title: '📄 Условия гарантии', text: 'Вопрос о гарантийности рассматривается после диагностики и проверки соблюдения условий гарантии изготовителя. Просьба предоставить результаты диагностики и необходимые фото.' },
-            { title: '🔌 Внешний БП не по гарантии', text: 'БП не предоставляется по гарантии.\n\nп. 7 гарантий изготовителя.\n\nВнешний блок питания является отдельным комплектующим и не относится непосредственно к составу основного оборудования.\n\nОн относится к расходным/сменным внешним компонентам и подвержен отдельному эксплуатационному износу. Неисправность внешнего БП часто может быть вызвана внешними факторами: скачками напряжения, качеством электросети, перегрузкой, использованием несовместимого оборудования.\n\nhttps://help.kkm.solutions/' },
+            { title: '🔌 Внешний БП не по гарантии', text: 'БП не предоставляется по гарантии.\n\nп. 7 гарантий изготовителя.\n\nВнешний блок питания является отдельным комплектующим и не относится непосредственно к составу основного оборудования.\n\nОн относится к расходным/сменным внешним компонентам и подвержен отдельному эксплуатационному износу. Неисправность внешнего БП часто может быть вызвана внешними факторами: скачками напряжения, качеством электросети, перегрузкой, использованием несовместимого оборудования.\n\nhttps://help.kkm.solutions/ckeditor/attachment_files/6513670?token=217805bf71' },
         ] },
         { title: '🤝 Направление', children: [
             { title: '🛠️ В АСЦ', text: 'Мы можем предоставить консультацию в рамках заявки. Для ремонта, настройки или диагностики на месте просьба обратиться в ближайший авторизованный сервисный центр: https://optposcenter.ru/service/' },
@@ -340,6 +343,35 @@
             #okdesk-mobile-app .m-icon { width:42px; height:42px; flex:0 0 42px; border:0; border-radius:6px; background:rgba(255,255,255,.15); color:#fff; font-size:20px; }
             #okdesk-mobile-app .m-icon[hidden], #okdesk-mobile-app [hidden] { display:none !important; }
             #okdesk-mobile-app .m-body { min-height:0; flex:1; overflow:auto; overscroll-behavior:contain; }
+            #okdesk-mobile-app .m-workspace { display:flex; flex:1; min-width:0; min-height:0; overflow:hidden; }
+            #okdesk-mobile-app .m-list-pane, #okdesk-mobile-app .m-detail-pane { min-width:0; width:100%; }
+            #okdesk-mobile-app[data-layout="single"][data-has-issue="true"] .m-list-pane,
+            #okdesk-mobile-app[data-layout="single"][data-has-issue="false"] .m-detail-pane { display:none; }
+            #okdesk-mobile-app[data-layout="split"] .m-workspace { display:grid; grid-template-columns:clamp(280px, 32%, 380px) minmax(0, 1fr); }
+            #okdesk-mobile-app[data-layout="split"] .m-list-pane { border-right:1px solid var(--mobile-border, #c5d5d2); }
+            #okdesk-mobile-app[data-layout="split"] .m-list-pane .m-row-title,
+            #okdesk-mobile-app[data-flex="tabletop"] .m-list-pane .m-row-title { display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:3; overflow:hidden; line-height:1.4; }
+            #okdesk-mobile-app .m-row-wrap.is-selected { box-shadow:inset 4px 0 0 var(--mobile-accent, #327b91); background:var(--mobile-raised, #e4f1f0); }
+            #okdesk-mobile-app .m-row-wrap.is-selected .m-row { background:transparent; }
+            #okdesk-mobile-app .m-empty-detail { display:flex; min-height:100%; flex-direction:column; align-items:center; justify-content:center; gap:8px; padding:24px; text-align:center; color:var(--mobile-muted, #526361); }
+            #okdesk-mobile-app .m-empty-detail strong { color:var(--mobile-text, #244a41); font-size:20px; }
+            #okdesk-mobile-app[data-layout="single"] .m-list-refresh { display:none; }
+            #okdesk-mobile-app[data-flex="book"] .m-workspace { grid-template-columns:var(--fold-before) var(--fold-gap) minmax(0, 1fr); }
+            #okdesk-mobile-app[data-flex="book"] .m-list-pane { grid-column:1; }
+            #okdesk-mobile-app[data-flex="book"] .m-detail-pane { grid-column:3; }
+            #okdesk-mobile-app[data-flex="tabletop"] .m-workspace { display:grid; grid-template-columns:minmax(0, 1fr); grid-template-rows:var(--fold-before) var(--fold-gap) minmax(0, 1fr); }
+            #okdesk-mobile-app[data-flex="tabletop"] .m-list-pane { grid-row:1; }
+            #okdesk-mobile-app[data-flex="tabletop"][data-has-issue="true"] .m-detail-pane { display:grid; grid-row:1 / -1; grid-template-columns:minmax(0, 1fr); grid-template-rows:var(--fold-before) var(--fold-gap) minmax(0, 1fr); overflow:hidden; }
+            #okdesk-mobile-app .m-flex-read, #okdesk-mobile-app .m-flex-controls { min-width:0; min-height:0; overflow:auto; overscroll-behavior:contain; }
+            #okdesk-mobile-app .m-flex-read { grid-row:1; }
+            #okdesk-mobile-app .m-flex-controls { grid-row:3; }
+            #okdesk-mobile-app .m-list-tools { display:none; min-width:0; min-height:0; overflow:auto; overscroll-behavior:contain; background:var(--mobile-surface, #fff); }
+            #okdesk-mobile-app[data-flex="tabletop"][data-has-issue="false"] .m-list-tools { display:block; grid-row:3; }
+            #okdesk-mobile-app .m-list-tools h2 { margin:0; padding:12px 12px 4px; font-size:15px; }
+            #okdesk-mobile-app[data-flex="tabletop"] .m-list-tools .m-list-refresh { display:block; }
+            #okdesk-mobile-app .m-list-tools .m-recent-list { flex-wrap:wrap; overflow:visible; }
+            #okdesk-mobile-app[data-motion="on"] .m-workspace,
+            #okdesk-mobile-app[data-motion="on"][data-flex="tabletop"] .m-detail-pane { transition:grid-template-rows .22s cubic-bezier(.2,.7,.2,1), grid-template-columns .22s cubic-bezier(.2,.7,.2,1); }
             #okdesk-mobile-app .m-toolbar { display:flex; align-items:center; gap:8px; padding:10px 12px; border-bottom:1px solid #d5e0dc; background:#fff; }
             #okdesk-mobile-app .m-toolbar input { flex:1; min-width:0; height:42px; padding:0 12px; border:1px solid #c5d5d2; border-radius:8px; background:#f3f7f6; font-size:16px; }
             #okdesk-mobile-app .m-tabs-bar { display:flex; background:#fff; border-bottom:1px solid #d7dfdc; }
@@ -434,12 +466,24 @@
         const app = document.createElement('div');
         app.id = 'okdesk-mobile-app';
         app.dataset.okdeskScriptUi = 'true';
-        app.innerHTML = `<header class="m-top"><button type="button" class="m-icon" data-action="back" aria-label="Назад" hidden>←</button><strong data-role="heading">Заявки</strong><button type="button" class="m-icon" data-action="refresh" aria-label="Обновить">⟳</button><button type="button" class="m-icon" data-action="desktop" aria-label="ПК-вид" title="ПК-вид">ПК</button><button type="button" class="m-icon" data-action="settings" aria-label="Настройки">⚙</button></header><main class="m-body" data-role="content"></main>`;
+        app.innerHTML = `<header class="m-top"><button type="button" class="m-icon" data-action="back" aria-label="Назад" hidden>←</button><strong data-role="heading">Заявки</strong><button type="button" class="m-icon" data-action="layout" aria-label="Вид заявок" title="Вид заявок">◫</button><button type="button" class="m-icon" data-action="refresh" aria-label="Обновить">⟳</button><button type="button" class="m-icon" data-action="desktop" aria-label="ПК-вид" title="ПК-вид">ПК</button><button type="button" class="m-icon" data-action="settings" aria-label="Настройки">⚙</button></header><main class="m-workspace"><aside class="m-body m-list-pane" data-role="list" aria-label="Список заявок"></aside><section class="m-body m-detail-pane" data-role="content" aria-label="Карточка заявки"></section></main>`;
         document.body.appendChild(app);
         const state = { issueId: getIssueId(), issue: null, tabs: mobileReadTabs(), tabId: GM_getValue(MOBILE_ACTIVE_TAB_KEY, 'mine'), query: '', page: 0, items: [], hasMore: true, loading: false, listError: '', listRequest: 0, detailRequest: 0 };
         if (!state.tabs.some((tab) => tab.id === state.tabId)) state.tabId = state.tabs[0].id;
         let activeMobileSheetClose = null;
         const content = app.querySelector('[data-role="content"]');
+        const listContent = app.querySelector('[data-role="list"]');
+        const listTools = mobileNode('section', 'm-list-tools');
+        listTools.setAttribute('aria-label', 'Поиск и фильтры заявок');
+        app.querySelector('.m-workspace').appendChild(listTools);
+        let listInitialized = false;
+        let listRows = null;
+        let detailFlow = null;
+        let foldLayoutTimer;
+        let previousLayout = '';
+        let layoutAnimations = [];
+        const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+        reducedMotion.addEventListener('change', mobileApplyLayout);
         const assigneeRequests = new Map();
         const assigneeQueue = [];
         let assigneeActive = 0;
@@ -448,17 +492,180 @@
                 if (!entry.isIntersecting) return;
                 assigneeObserver.unobserve(entry.target);
                 mobileFillAssignee(entry.target);
-            }), { root: content, rootMargin: '250px' })
+            }), { root: listContent, rootMargin: '250px' })
             : null;
         app.querySelector('[data-action="back"]').onclick = () => mobileNavigate(null);
         app.querySelector('[data-action="refresh"]').onclick = () => state.issueId ? mobileLoadIssue(state.issueId) : mobileLoadList(true);
         app.querySelector('[data-action="desktop"]').onclick = () => { GM_setValue(MOBILE_VIEW_KEY, 'off'); location.reload(); };
         app.querySelector('[data-action="settings"]').onclick = openSettings;
-        window.addEventListener('popstate', () => {
-            state.issueId = getIssueId();
-            if (state.issueId) mobileLoadIssue(state.issueId);
-            else { mobileRenderList(); if (!state.items.length) mobileLoadList(true); }
+        app.querySelector('[data-action="layout"]').onclick = () => {
+            const { body, close } = mobileShowSheet('Вид заявок');
+            const current = GM_getValue(MOBILE_LAYOUT_KEY, 'auto');
+            [['auto', 'Автоматически'], ['split', 'Две панели'], ['single', 'Одна панель']].forEach(([mode, label]) => {
+                const button = mobileSheetChoice(body, (current === mode ? '✓ ' : '') + label, () => {
+                    GM_setValue(MOBILE_LAYOUT_KEY, mode); close(); mobileApplyLayout();
+                });
+                button.setAttribute('aria-pressed', String(current === mode));
+                if (mode === 'split' && window.innerWidth < 720) button.disabled = true;
+            });
+            if (window.innerWidth < 720) body.appendChild(mobileNode('div', 'm-muted', 'Для двух панелей нужно более широкое окно.'));
+            const flexLabel = mobileNode('label', 'm-line');
+            const flex = mobileNode('input'); flex.type = 'checkbox';
+            flex.checked = GM_getValue(MOBILE_FLEX_KEY, true);
+            flex.onchange = () => { GM_setValue(MOBILE_FLEX_KEY, flex.checked); mobileApplyLayout(); };
+            flexLabel.append(flex, mobileNode('span', '', 'Учитывать сгиб экрана (Flex)'));
+            body.appendChild(flexLabel);
+            const motionLabel = mobileNode('label', 'm-line');
+            const motion = mobileNode('input'); motion.type = 'checkbox';
+            motion.checked = GM_getValue(MOBILE_MOTION_KEY, true);
+            motion.onchange = () => { GM_setValue(MOBILE_MOTION_KEY, motion.checked); mobileApplyLayout(); };
+            motionLabel.append(motion, mobileNode('span', '', 'Плавные переходы'));
+            body.appendChild(motionLabel);
+        };
+        window.addEventListener('resize', mobileApplyLayout);
+        window.addEventListener('okdesk-fold-change', () => {
+            window.clearTimeout(foldLayoutTimer);
+            app.dataset.layoutPending = 'true';
+            foldLayoutTimer = window.setTimeout(() => {
+                delete app.dataset.layoutPending;
+                mobileApplyLayout();
+            }, 140);
         });
+        window.addEventListener('popstate', () => {
+            activeMobileSheetClose?.();
+            state.issueId = getIssueId();
+            state.issue = null;
+            mobileApplyLayout(); mobileUpdateSelection();
+            if (state.issueId) mobileLoadIssue(state.issueId);
+            else { state.detailRequest++; mobileShowEmptyIssue(); if (!listInitialized) mobileRenderList(); if (!state.items.length) mobileLoadList(true); }
+        });
+
+        function mobileFoldGeometry() {
+            if (!GM_getValue(MOBILE_FLEX_KEY, true) || GM_getValue(MOBILE_LAYOUT_KEY, 'auto') === 'single') return null;
+            const fold = window.__okdeskFold;
+            if (!fold || !['vertical', 'horizontal'].includes(fold.orientation)
+                || !['left', 'top', 'right', 'bottom', 'width', 'height'].every((key) => Number.isFinite(fold[key]))
+                || fold.width <= 0 || fold.height <= 0 || fold.right < fold.left || fold.bottom < fold.top) return null;
+            const rect = app.querySelector('.m-workspace').getBoundingClientRect();
+            const vertical = fold.orientation === 'vertical';
+            const scale = vertical ? window.innerWidth / fold.width : window.innerHeight / fold.height;
+            const offset = vertical ? rect.left : rect.top;
+            const start = (vertical ? fold.left : fold.top) * scale - offset;
+            const end = (vertical ? fold.right : fold.bottom) * scale - offset;
+            const before = Math.floor(start - 8);
+            const after = Math.floor((vertical ? rect.width : rect.height) - end - 8);
+            if (before < (vertical ? 240 : 120) || after < (vertical ? 300 : 140)) return null;
+            return { kind: vertical ? 'book' : 'tabletop', before, gap: Math.ceil(end - start + 16) };
+        }
+
+        function mobileIsSplit() {
+            const fold = mobileFoldGeometry();
+            if (fold) return fold.kind === 'book';
+            const mode = GM_getValue(MOBILE_LAYOUT_KEY, 'auto');
+            return mode !== 'single' && window.innerWidth >= (mode === 'split' ? 720 : 840);
+        }
+
+        function mobileApplyLayout() {
+            const motion = GM_getValue(MOBILE_MOTION_KEY, true) && !reducedMotion.matches;
+            const before = new Map([listContent, content, listTools, ...content.querySelectorAll('.m-flex-read, .m-flex-controls')]
+                .map((node) => [node, node.getBoundingClientRect()]));
+            const fold = mobileFoldGeometry();
+            app.dataset.motion = motion ? 'on' : 'off';
+            app.dataset.flex = fold?.kind || 'none';
+            if (fold) {
+                app.style.setProperty('--fold-before', `${fold.before}px`);
+                app.style.setProperty('--fold-gap', `${fold.gap}px`);
+            }
+            app.dataset.layout = mobileIsSplit() ? 'split' : 'single';
+            app.dataset.hasIssue = String(!!state.issueId);
+            const heading = app.querySelector('[data-role="heading"]');
+            heading.textContent = state.issueId ? `${window.innerWidth < 400 ? '' : 'Заявка '}№${state.issueId}` : 'Заявки';
+            heading.title = state.issueId ? `Заявка №${state.issueId}` : 'Заявки';
+            app.querySelector('[data-action="back"]').hidden = !state.issueId;
+            mobileReflowDetail();
+            mobileReflowList();
+            if (mobileIsSplit() && !listInitialized) mobileLoadList(true);
+            const layout = `${app.dataset.layout}/${app.dataset.flex}/${fold?.kind === 'tabletop' ? app.dataset.hasIssue : ''}`;
+            if (!motion || (previousLayout && layout !== previousLayout)) {
+                layoutAnimations.forEach((animation) => animation.cancel());
+                layoutAnimations = [];
+            }
+            if (motion && previousLayout && layout !== previousLayout) {
+                const targets = app.dataset.flex === 'tabletop' && state.issueId
+                    ? [...content.querySelectorAll('.m-flex-read, .m-flex-controls')]
+                    : [listContent, content, listTools];
+                targets.forEach((node) => {
+                    const rect = node.getBoundingClientRect();
+                    if (!rect.width || !rect.height || typeof node.animate !== 'function') return;
+                    const old = before.get(node);
+                    const x = Math.max(-24, Math.min(24, old?.width ? old.left - rect.left : 0));
+                    const y = Math.max(-16, Math.min(16, old?.height ? old.top - rect.top : 8));
+                    layoutAnimations.push(node.animate([
+                        { opacity: .6, transform: `translate(${x}px, ${y}px)` },
+                        { opacity: 1, transform: 'translate(0, 0)' },
+                    ], { duration: 220, easing: 'cubic-bezier(.2,.7,.2,1)' }));
+                });
+            }
+            previousLayout = layout;
+        }
+
+        function mobileReflowList() {
+            const controls = app.querySelector('[data-role="list-controls"]');
+            if (!controls) return;
+            const focused = controls.contains(document.activeElement) ? document.activeElement : null;
+            if (app.dataset.flex === 'tabletop' && !state.issueId) {
+                if (controls.parentElement === listTools) return;
+                listTools.replaceChildren(mobileNode('h2', '', 'Поиск и фильтры'), controls);
+            } else {
+                if (controls.parentElement === listContent) return;
+                listContent.prepend(controls);
+                listTools.replaceChildren();
+            }
+            focused?.focus({ preventScroll: true });
+        }
+
+        function mobileReflowDetail() {
+            const read = content.querySelector(':scope > .m-flex-read');
+            const focused = content.contains(document.activeElement) ? document.activeElement : null;
+            if (app.dataset.flex !== 'tabletop' || !state.issueId) {
+                if (read && detailFlow) {
+                    content.replaceChildren(...detailFlow);
+                    detailFlow = null;
+                    focused?.focus({ preventScroll: true });
+                }
+                return;
+            }
+            if (read || !state.issue) return;
+            const compose = content.querySelector('[data-mobile-section="compose"]');
+            const comments = content.querySelector('[data-mobile-section="comments"]');
+            if (!compose || !comments) return;
+            detailFlow = [...content.children];
+            const reading = mobileNode('div', 'm-flex-read');
+            reading.setAttribute('role', 'region'); reading.setAttribute('aria-label', 'Переписка и информация о заявке');
+            const controls = mobileNode('div', 'm-flex-controls');
+            controls.setAttribute('role', 'region'); controls.setAttribute('aria-label', 'Ответ и быстрые действия');
+            const quick = content.querySelector('[data-mobile-section="quick"]');
+            const status = content.querySelector('[data-mobile-section="status"]');
+            reading.append(comments, ...detailFlow.filter((node) => ![comments, compose, quick, status].includes(node)));
+            controls.append(...[compose, quick, status].filter(Boolean));
+            content.replaceChildren(reading, controls);
+            focused?.focus({ preventScroll: true });
+        }
+
+        function mobileShowEmptyIssue() {
+            detailFlow = null;
+            const empty = mobileNode('div', 'm-empty-detail');
+            empty.append(mobileNode('strong', '', 'Выберите заявку'), mobileNode('span', '', 'Список заявок слева'));
+            content.replaceChildren(empty);
+        }
+
+        function mobileUpdateSelection() {
+            listContent.querySelectorAll('.m-row-wrap[data-issue-id]').forEach((row) => {
+                const selected = row.dataset.issueId === state.issueId;
+                row.classList.toggle('is-selected', selected);
+                row.querySelector('.m-row')?.setAttribute('aria-current', selected ? 'true' : 'false');
+            });
+        }
 
         function mobileNode(tag, className = '', value = '') {
             const element = document.createElement(tag);
@@ -505,8 +712,8 @@
             GM_setValue(MOBILE_TABS_KEY, JSON.stringify(state.tabs));
             if (!state.tabs.some((tab) => tab.id === state.tabId)) state.tabId = state.tabs[0].id;
             GM_setValue(MOBILE_ACTIVE_TAB_KEY, state.tabId);
-            if (reloadList && !state.issueId) { state.listRequest++; state.loading = false; mobileLoadList(true); }
-            else if (!state.issueId) mobileRenderList();
+            if (reloadList) { state.listRequest++; state.loading = false; mobileLoadList(true); }
+            else mobileRenderList();
         }
 
         function mobileOpenTabEditor(tabId = state.tabId) {
@@ -528,7 +735,7 @@
             };
             groupSave.onclick = () => {
                 if (!persistGroup()) return;
-                if (!state.issueId && mobileCurrentTab().scope === 'group') mobileSaveTabs();
+                if (mobileCurrentTab().scope === 'group') mobileSaveTabs();
             };
             body.append(groupLabel, groupInput, groupSave, groupFeedback);
             const tabList = mobileNode('div');
@@ -823,20 +1030,21 @@
 
         function mobileNavigate(issueId) {
             activeMobileSheetClose?.();
-            if (issueId && !state.issueId) mobileRememberSearch(state.query);
-            if (issueId) { state.listRequest++; state.loading = false; }
+            if (issueId) mobileRememberSearch(state.query);
             state.issueId = issueId;
             state.issue = null;
             history.pushState({ okdeskMobile: true }, '', issueId ? `/issues/${issueId}` : '/issues');
             content.scrollTop = 0;
+            mobileApplyLayout(); mobileUpdateSelection();
             if (issueId) mobileLoadIssue(issueId);
-            else { mobileRenderList(); if (!state.items.length) mobileLoadList(true); }
+            else { state.detailRequest++; mobileShowEmptyIssue(); mobileRenderList(); if (!state.items.length) mobileLoadList(true); }
         }
 
         function mobileRenderList() {
-            app.querySelector('[data-role="heading"]').textContent = 'Заявки';
-            app.querySelector('[data-action="back"]').hidden = true;
-            content.replaceChildren();
+            listInitialized = true;
+            const scrollTop = listContent.scrollTop;
+            listContent.replaceChildren();
+            listTools.replaceChildren();
             const toolbar = mobileNode('div', 'm-toolbar');
             const search = mobileNode('input');
             search.type = 'search'; search.placeholder = '№ заявки или тема в списке'; search.value = state.query;
@@ -853,7 +1061,11 @@
             const filterButton = mobileNode('button', '', '☷');
             filterButton.type = 'button'; filterButton.setAttribute('aria-label', 'Вкладки и фильтры');
             filterButton.onclick = () => mobileOpenTabEditor();
-            toolbar.append(search, filterButton);
+            const refreshList = mobileNode('button', 'm-list-refresh', '⟳');
+            refreshList.type = 'button'; refreshList.title = 'Обновить список заявок';
+            refreshList.setAttribute('aria-label', refreshList.title);
+            refreshList.onclick = () => mobileLoadList(true);
+            toolbar.append(search, refreshList, filterButton);
             const tabBar = mobileNode('div', 'm-tabs-bar');
             const tabs = mobileNode('div', 'm-tabs');
             state.tabs.forEach((tab) => {
@@ -877,6 +1089,7 @@
             addTab.onclick = () => mobileOpenTabEditor(null);
             tabBar.append(tabs, addTab);
             const rows = mobileNode('div');
+            listRows = rows;
             const recentPanel = mobileNode('div', 'm-recent-searches');
             const renderRecent = () => {
                 recentPanel.replaceChildren();
@@ -903,10 +1116,15 @@
                 recentPanel.append(head, list);
             };
             renderRecent();
-            content.append(toolbar, recentPanel, tabBar, rows);
+            const listControls = mobileNode('div');
+            listControls.dataset.role = 'list-controls';
+            listControls.append(toolbar, recentPanel, tabBar);
+            listContent.append(listControls, rows);
+            mobileReflowList();
             const activeTab = tabs.querySelector('[aria-selected="true"]');
             if (activeTab) tabs.scrollLeft = Math.max(0, activeTab.offsetLeft - 12);
             mobileRenderListRows(rows);
+            listContent.scrollTop = scrollTop;
         }
 
         function mobileFillAssignee(label) {
@@ -945,6 +1163,7 @@
             }
             state.items.filter((issue) => !query || `${issue.id} ${issue.title || ''}`.toLocaleLowerCase('ru').includes(query)).forEach((issue) => {
                 const wrap = mobileNode('div', 'm-row-wrap');
+                wrap.dataset.issueId = String(issue.id);
                 const row = mobileNode('button', 'm-row');
                 row.type = 'button'; row.onclick = () => mobileNavigate(String(issue.id));
                 const meta = mobileNode('div', 'm-row-meta');
@@ -986,6 +1205,7 @@
                 more.type = 'button'; more.onclick = () => mobileLoadList(false);
                 rows.appendChild(more);
             }
+            mobileUpdateSelection();
         }
 
         function mobilePreviewIssue(issue) {
@@ -1012,7 +1232,7 @@
         }
 
         async function mobileLoadList(reset) {
-            if (state.loading || state.issueId) return;
+            if (state.loading) return;
             if (reset) { state.page = 0; state.items = []; state.hasMore = true; state.listError = ''; }
             if (!state.hasMore) return;
             state.loading = true;
@@ -1039,37 +1259,40 @@
                 if (tab.withoutAnswer) params.set('without_answer', 'true');
                 if (tab.overdue) params.set('overdue', 'true');
                 const issues = await apiRequest(`/issues/list?${params}`);
-                if (request !== state.listRequest || state.issueId) return;
+                if (request !== state.listRequest) return;
                 if (!Array.isArray(issues)) throw new Error('неожиданный ответ API');
                 state.items.push(...issues);
                 state.page++;
                 state.hasMore = issues.length === 30;
             } catch (error) {
-                if (request === state.listRequest && !state.issueId) {
+                if (request === state.listRequest) {
                     state.hasMore = false;
                     state.listError = !GM_getValue(API_TOKEN_KEY, '')
                         ? 'Мобильный интерфейс доступен без API-токена. Для загрузки списка заявок и API-действий добавьте токен: ☰ → Настройка API Okdesk.'
                         : `Не удалось загрузить заявки: ${error.message}`;
                 }
             } finally {
-                if (request === state.listRequest && !state.issueId) {
+                if (request === state.listRequest) {
                     state.loading = false;
                     mobileRenderList();
                 }
             }
         }
 
+        mobileShowEmptyIssue();
+        mobileApplyLayout();
         if (state.issueId) mobileLoadIssue(state.issueId);
         else mobileLoadList(true);
 
         function mobileLoadIssue(issueId) {
+            if (state.issueId !== issueId) return Promise.resolve();
             return loadMobileIssueDetail(issueId);
         }
 
         async function loadMobileIssueDetail(issueId) {
             const request = ++state.detailRequest;
-            app.querySelector('[data-role="heading"]').textContent = `Заявка №${issueId}`;
-            app.querySelector('[data-action="back"]').hidden = false;
+            mobileApplyLayout();
+            detailFlow = null;
             content.replaceChildren(mobileNode('div', 'm-section m-muted', 'Загружаю заявку...'));
             try {
                 const [issue, comments] = await Promise.all([
@@ -1257,6 +1480,11 @@
 
         function mobileRenderIssue(issueId, issue, comments) {
             state.issue = issue;
+            const index = state.items.findIndex((item) => String(item.id) === issueId);
+            if (index >= 0) {
+                state.items[index] = { ...state.items[index], ...issue };
+                if (listRows) mobileRenderListRows(listRows);
+            }
             content.replaceChildren();
             const summary = mobileNode('section', 'm-section');
             summary.appendChild(mobileNode('h1', 'm-issue-title', issue.title || `Заявка №${issueId}`));
@@ -1296,6 +1524,7 @@
             }
 
             const quickSection = mobileNode('section', 'm-section');
+            quickSection.dataset.mobileSection = 'quick';
             quickSection.appendChild(mobileNode('h2', '', 'Быстрые ответы'));
             const quickActions = mobileNode('div', 'm-actions');
             getQuickReplies().forEach((reply, index) => {
@@ -1314,6 +1543,7 @@
             content.appendChild(quickSection);
 
             const commentSection = mobileNode('section', 'm-section m-thread-section');
+            commentSection.dataset.mobileSection = 'comments';
             commentSection.appendChild(mobileNode('h2', '', `Комментарии (${comments.length})`));
             const thread = mobileNode('div');
             const sorted = comments.slice().sort((left, right) => Date.parse(right.published_at || '') - Date.parse(left.published_at || '') || Number(right.id) - Number(left.id));
@@ -1535,6 +1765,8 @@
             statusLine.append(statusSelect, change);
             statusSection.append(statusLine, statusFeedback);
             content.prepend(statusSection);
+            detailFlow = null;
+            mobileReflowDetail();
         }
 
         function mobileConfirm(title, description, confirmLabel = 'Отправить') {

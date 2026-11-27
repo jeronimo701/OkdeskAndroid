@@ -9,6 +9,7 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Build;
@@ -44,6 +45,12 @@ import androidx.webkit.JavaScriptReplyProxy;
 import androidx.webkit.WebMessageCompat;
 import androidx.webkit.WebViewCompat;
 import androidx.webkit.WebViewFeature;
+import androidx.core.util.Consumer;
+import androidx.window.java.layout.WindowInfoTrackerCallbackAdapter;
+import androidx.window.layout.DisplayFeature;
+import androidx.window.layout.FoldingFeature;
+import androidx.window.layout.WindowInfoTracker;
+import androidx.window.layout.WindowLayoutInfo;
 
 import org.json.JSONObject;
 
@@ -85,6 +92,12 @@ public final class MainActivity extends Activity {
     private TextView appBarAction;
     private LinearLayout drawerPanel;
     private Spinner themeSelector;
+    private WindowInfoTrackerCallbackAdapter foldTracker;
+    private WindowLayoutInfo foldLayoutInfo;
+    private final Consumer<WindowLayoutInfo> foldListener = info -> {
+        foldLayoutInfo = info;
+        publishFoldGeometry();
+    };
 
     @Override
     @SuppressLint("RequiresFeature")
@@ -116,6 +129,14 @@ public final class MainActivity extends Activity {
         pageContainer.addView(webView, new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, 0, 1f));
         createNavigationUi();
+        rootView.addOnLayoutChangeListener((view, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom) -> {
+            if (drawerPanel == null || right - left == oldRight - oldLeft) return;
+            ViewGroup.LayoutParams params = drawerPanel.getLayoutParams();
+            params.width = Math.min(dp(340), Math.max(0, right - left - dp(48)));
+            drawerPanel.setLayoutParams(params);
+            publishFoldGeometry();
+        });
+        webView.addOnLayoutChangeListener((view, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom) -> publishFoldGeometry());
         rootView.setOnApplyWindowInsetsListener((view, insets) -> {
             view.setPadding(0, 0, 0, 0);
             return insets;
@@ -192,6 +213,7 @@ public final class MainActivity extends Activity {
             @Override
             public void onPageFinished(WebView view, String url) {
                 Uri page = Uri.parse(url);
+                publishFoldGeometry();
                 updateAppBar(page, isOkdeskOrigin(page) && page.getQueryParameterNames().contains("okdesk_desktop"));
                 if (isOkdeskOrigin(page) && !page.getQueryParameterNames().contains("okdesk_desktop")) {
                     view.evaluateJavascript("!!document.getElementById('okdesk-mobile-app')", result -> {
@@ -868,6 +890,61 @@ public final class MainActivity extends Activity {
                 finish();
             }
         });
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if (webView == null) return;
+        try {
+            if (foldTracker == null) foldTracker = new WindowInfoTrackerCallbackAdapter(WindowInfoTracker.getOrCreate(this));
+            foldTracker.addWindowLayoutInfoListener(this, getMainExecutor(), foldListener);
+        } catch (RuntimeException | LinkageError error) {
+            Log.w("OkdeskMobile", "Fold detection unavailable; using responsive layout", error);
+            foldLayoutInfo = null;
+            publishFoldGeometry();
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        try {
+            if (foldTracker != null) foldTracker.removeWindowLayoutInfoListener(foldListener);
+        } catch (RuntimeException | LinkageError error) {
+            Log.w("OkdeskMobile", "Unable to stop fold listener", error);
+        }
+        super.onStop();
+    }
+
+    private void publishFoldGeometry() {
+        if (webView == null || webView.getUrl() == null || !isOkdeskOrigin(Uri.parse(webView.getUrl()))
+                || webView.getWidth() <= 0 || webView.getHeight() <= 0) return;
+        try {
+            JSONObject geometry = new JSONObject().put("orientation", "none");
+            if (foldLayoutInfo != null) {
+                int[] location = new int[2];
+                webView.getLocationInWindow(location);
+                Rect webBounds = new Rect(location[0], location[1], location[0] + webView.getWidth(), location[1] + webView.getHeight());
+                for (DisplayFeature feature : foldLayoutInfo.getDisplayFeatures()) {
+                    if (!(feature instanceof FoldingFeature)) continue;
+                    FoldingFeature fold = (FoldingFeature) feature;
+                    if (!fold.isSeparating() && !FoldingFeature.State.HALF_OPENED.equals(fold.getState())
+                            && !FoldingFeature.OcclusionType.FULL.equals(fold.getOcclusionType())) continue;
+                    Rect bounds = fold.getBounds();
+                    // A flexible fold can be a zero-width or zero-height line.
+                    if (bounds.right < webBounds.left || bounds.left > webBounds.right
+                            || bounds.bottom < webBounds.top || bounds.top > webBounds.bottom) continue;
+                    geometry.put("orientation", FoldingFeature.Orientation.HORIZONTAL.equals(fold.getOrientation()) ? "horizontal" : "vertical")
+                        .put("left", bounds.left - location[0]).put("top", bounds.top - location[1])
+                        .put("right", bounds.right - location[0]).put("bottom", bounds.bottom - location[1])
+                        .put("width", webView.getWidth()).put("height", webView.getHeight());
+                    break;
+                }
+            }
+            webView.evaluateJavascript("window.__okdeskFold=" + geometry + ";window.dispatchEvent(new Event('okdesk-fold-change'));", null);
+        } catch (RuntimeException | org.json.JSONException error) {
+            Log.w("OkdeskMobile", "Unable to update fold geometry", error);
+        }
     }
 
     @Override

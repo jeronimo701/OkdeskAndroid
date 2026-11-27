@@ -10,8 +10,8 @@ android {
         applicationId 'ru.poscenter.okdesk.mobile'
         minSdk 29
         targetSdk 35
-        versionCode 36
-        versionName '0.2.34'
+        versionCode 37
+        versionName '0.2.35'
     }
 
     compileOptions {
@@ -23,4 +23,5 @@ android {
 
 dependencies {
     implementation 'androidx.webkit:webkit:1.17.1'
+    implementation 'androidx.window:window-java:1.5.1'
 }

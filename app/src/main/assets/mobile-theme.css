@@ -26,6 +26,15 @@
     box-shadow: 0 1px 4px rgba(0, 0, 0, .22);
 }
 
+:root[data-okdesk-script-theme="dark"] #okdesk-mobile-app .m-row-wrap.is-selected {
+    background: var(--mobile-raised);
+    box-shadow: inset 4px 0 0 var(--mobile-accent);
+}
+
+:root[data-okdesk-script-theme="dark"] #okdesk-mobile-app .m-row-wrap.is-selected .m-row {
+    background: transparent;
+}
+
 :root[data-okdesk-script-theme="dark"] #okdesk-mobile-app .m-row:active,
 :root[data-okdesk-script-theme="dark"] #okdesk-mobile-app .m-sheet-choice:active {
     background: #2d4545;
